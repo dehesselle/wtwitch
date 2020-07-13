@@ -87,6 +87,9 @@ TURQOISE="\e[96m"
 # Get beginning of $LANG for translations
 WTWITCH_LANG="${LANG%_*}"
 
+# 'date' command
+DATE=date
+
 # -----------------------------------------
 # ------------- Translations --------------
 # -----------------------------------------
@@ -350,6 +353,11 @@ if [[ "${useColors}" == "false" ]]; then
   TURQOISE="${NC}"
 fi
 
+# Platform macOS: use GNU date
+if [[ "$(uname)" == "Darwin" ]]; then
+  DATE=gdate
+fi
+
 # Debugging
 if [[ "$*" == *"-d"* ]] || [[ "$*" == *"--debug"* ]]; then
   # Avoid subshells, print full curl output, and more behavioral changes
@@ -368,7 +376,7 @@ if [[ "$*" == *"-d"* ]] || [[ "$*" == *"--debug"* ]]; then
   printf "Starting wtwitch debug log\n"
   printf "Package: %s\n" "${_packageinfo}"
   printf "Versions: bash-%s wtwitch-%s %s\n" "${BASH_VERSION}" "${VERSION}" "$(jq --version) $(streamlink --version)"
-  printf "Date: %s\n\nCommand: wtwitch %s\n\n" "$(date)" "$*"
+  printf "Date: %s\n\nCommand: wtwitch %s\n\n" "$($DATE)" "$*"
   printf "Config file:\n\n%s\n\n" "$(jq -r "." "${CONFIG_FILE}")"
   printf "%s\n                         Begin log\n%s\n\n" "${_dashes}" "${_dashes}"
 
@@ -452,13 +460,13 @@ download_token()
 
   # Add token to config and update token expiration date
   write_setting ".apiToken" "${newToken}"
-  write_setting ".apiTokenExpiry" "$(LANG=C date -d tomorrow +%s)"
+  write_setting ".apiTokenExpiry" "$(LANG=C $DATE -d tomorrow +%s)"
 }
 
 # If the API token is empty,
 # If the API token is null,
 # OR if API token is expired
-if [[ -z "${apiToken}" ]] || [[ "${apiToken}" == "null" ]] || [[ "$(LANG=C date +%s)" -gt "${apiTokenExpiry}" ]]; then
+if [[ -z "${apiToken}" ]] || [[ "${apiToken}" == "null" ]] || [[ "$(LANG=C $DATE +%s)" -gt "${apiTokenExpiry}" ]]; then
   download_token
 fi
 
@@ -762,7 +770,7 @@ check_twitch_streams()
     fi
 
     if [[ "${lastSubscriptionUpdate}" != "null" ]]; then
-      local -r currentDate="$(LANG=C date +%s)"
+      local -r currentDate="$(LANG=C $DATE +%s)"
       dateDiff="$(( currentDate - lastSubscriptionUpdate ))"
     fi
 
@@ -830,7 +838,7 @@ check_twitch_streams()
       wait
 
       # Update lastSubscriptionUpdate time
-      write_setting ".lastSubscriptionUpdate" "$(LANG=C date +%s)" &
+      write_setting ".lastSubscriptionUpdate" "$(LANG=C $DATE +%s)" &
     fi
 
     printf "\n"
@@ -1465,7 +1473,7 @@ while [[ $# -gt 0 ]]; do
       ;;
     -v|--version)
       printf "wtwitch v%s\n" "${VERSION}"
-      printf "Copyright (C) %s 2019-%s\n" "${CONTRIBUTORS}" "$(date +%Y)"
+      printf "Copyright (C) %s 2019-%s\n" "${CONTRIBUTORS}" "$($DATE +%Y)"
       printf "This is free software: you are free to change and redistribute it.\n"
       printf "There is NO WARRANTY, to the extent permitted by law.\n"
       break

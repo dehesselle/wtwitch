@@ -38,6 +38,13 @@ $ sudo apt install streamlink
 
 Afterwards, clone the repo like any distro other than Arch.
 
+### macOS
+You need to install additional dependencies through e.g. [homebrew](https://brew.sh/):
+
+```
+brew install bash coreutils jq
+```
+
 ### Any distro
 Clone the repository: `git clone https://git.sr.ht/~krathalan/wtwitch`
 
