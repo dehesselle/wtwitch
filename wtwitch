@@ -62,6 +62,10 @@ readonly CONFIG_FILE_DIRECTORY="${XDG_CONFIG_HOME:-${HOME}/.config}/${SCRIPT_NAM
 readonly CONFIG_FILE="${CONFIG_FILE_DIRECTORY}/config.json"
 readonly BLOCKLIST_FILE="${CONFIG_FILE_DIRECTORY}/blocklist"
 
+# Environment
+# If exists, source this for additional environment setup.
+readonly ENVIRONMENT_FILE="${CONFIG_FILE_DIRECTORY}/environment.sh"
+
 # Used to calculate output string lengths; see check_twitch_streams_helper()
 # and list_streamers_of_game_helper()
 readonly TERMINAL_WIDTH="$(tput cols)"
@@ -319,6 +323,11 @@ EOF
 # -----------------------------------------
 # ------- Pre-script: check & load --------
 # -----------------------------------------
+
+# Source file for environemnt customization, e.g. for to set custom PATHs.
+if [[ -f ${ENVIRONMENT_FILE} ]]; then
+  source ${ENVIRONMENT_FILE}
+fi
 
 # Check files -- create cache/config directories and required files
 mkdir -p "${CONFIG_FILE_DIRECTORY}" "${CACHE_FILE_DIRECTORY}"
