@@ -670,7 +670,7 @@ change_player()
   # Get localized strings
   mapfile -t localizedStrings <<< "$(jq -r ".change_player_not_found.${WTWITCH_LANG}, .change_player_warning.${WTWITCH_LANG}, .change_player_player.${WTWITCH_LANG}, .change_player_warning_text.${WTWITCH_LANG}" <<< "${TRANSLATIONS}")"
 
-  local -r playerName="$(to_lowercase "$1")"
+  local -r playerName="$1"
 
   # Check to make sure user has input player actually installed
   if [[ ! -x "$(command -v "${playerName}")" ]]; then
